@@ -10,6 +10,7 @@ import (
 )
 
 var (
+	greetingStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#FAFAFA")).Italic(true).Background(lipgloss.Color("#7D56F4"))
 	ErrStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#ff0000"))
 	SuccessStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#adfabb"))
 	WarnStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#ffdf12"))
@@ -30,6 +31,9 @@ func main() {
 		fmt.Println(ErrStyle.Render("❌ API_KEY variable not set"))
 		os.Exit(1)
 	}
+
+	fmt.Println(greetingStyle.Render("Welcome to Weatherchk!"))
+	fmt.Println()
 
 	client := WeatherClient(apiKey)
 	redisClient := Connect()
