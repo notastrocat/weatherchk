@@ -1,0 +1,6 @@
+# executable
+weatherchk
+
+# JSON sample files
+*.json
+
