@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export API_KEY=MVJ2XRJEGFPXG3FAP6SCPTCGZ
+source api-key.sh
 export COLORTERM=truecolor
 
 # command to start the app...
