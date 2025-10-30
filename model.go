@@ -15,7 +15,7 @@ import (
 type Model struct {
 	spinner   spinner.Model
 	client    *Client
-	result    string
+	result    map[string]interface{}
 	timeTaken time.Duration
 	loading   bool
 	err       error
@@ -25,9 +25,9 @@ type Model struct {
 
 // weatherMsg is used to deliver weather data
 type weatherMsg struct {
-	result string
+	result    map[string]interface{}
 	timeTaken time.Duration
-	err    error
+	err       error
 }
 
 var redisClient *redis.Client

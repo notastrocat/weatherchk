@@ -24,11 +24,11 @@ func WeatherClient(apiKey string) *Client {
 	}
 }
 
-func (c *Client) GetCurrentWeather() (string, time.Duration, error) {
+func (c *Client) GetCurrentWeather() (map[string]interface{}, time.Duration, error) {
 	city := LocationInput
 	unitType := UnitTypeInput
 	if city == "" {
-		return "", 0, fmt.Errorf("city cannot be empty")
+		return nil, 0, fmt.Errorf("city cannot be empty")
 	}
 	if unitType == "" {
 		fmt.Println(WarnStyle.Render("⚠ No unit type provided, defaulting to 'metric'"))
@@ -52,29 +52,28 @@ func (c *Client) GetCurrentWeather() (string, time.Duration, error) {
 	resp, err := c.httpClient.Get(url)
 	var timeTaken = time.Since(startTime)
 	if err != nil {
-		return "", timeTaken, err
+		return nil, timeTaken, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", timeTaken, fmt.Errorf("failed to get weather data: %s", resp.Status)
+		return nil, timeTaken, fmt.Errorf("failed to get weather data: %s", resp.Status)
 	}
 
 	var result map[string]interface{}
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return "", timeTaken, err
+		return nil, timeTaken, err
 	}
 
 	// Extract current conditions (this is a simplified example)
-	currentConditions, ok := result["currentConditions"].(map[string]interface{})
-	if !ok {
-		var timeTaken = time.Since(startTime)
-		return "", timeTaken, fmt.Errorf("invalid response format")
-	}
+	// currentConditions, ok := result["currentConditions"].(map[string]interface{})
+	// if !ok {
+	// 	var timeTaken = time.Since(startTime)
+	// 	return "", timeTaken, fmt.Errorf("invalid response format")
+	// }
 
-	temperature := currentConditions["temp"].(float64)
-	conditions := currentConditions["conditions"].(string)
+	// temperature := currentConditions["temp"].(float64)
+	// conditions := currentConditions["conditions"].(string)
 
-	return fmt.Sprintf("Current temperature in %s is %.1f°C (%s).", city, temperature, conditions),
-			timeTaken, nil
+	return result, timeTaken, nil
 }

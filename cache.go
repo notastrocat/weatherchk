@@ -6,12 +6,13 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
+    "github.com/nitishm/go-rejson/v4"
 )
 
 var ctx = context.Background()
 
-func Connect() (*redis.Client) {
-    // Create a new Redis client
+// Creates and returns a new Redis client
+func NewRedisClient() (*redis.Client) {
     rdb := redis.NewClient(&redis.Options{
         Addr:     "localhost:6379", // Redis server address
         Password: "",               // No password set
@@ -21,6 +22,15 @@ func Connect() (*redis.Client) {
 	return rdb
 }
 
+// ReJSONClient initializes a ReJSON handler with the given Redis client and sets it up.
+func ReJSONClient(rdb *redis.Client) *rejson.Handler {
+    rh := rejson.NewReJSONHandler()
+	rh.SetGoRedisClientWithContext(ctx, rdb)
+
+    return rh
+}
+
+// soon to be deprecated
 func SetData(rdb *redis.Client, key, val string) bool {
     // Set a value in Redis
     err := rdb.SetEx(ctx, key, val, 6 * time.Hour).Err()
@@ -32,11 +42,52 @@ func SetData(rdb *redis.Client, key, val string) bool {
 	return true
 }
 
+// soon to be deprecated
 func GetVal(rdb *redis.Client, key string) {
     // Get the value from Redis
     val, err := rdb.Get(ctx, key).Result()
     if err != nil {
         fmt.Println(ErrStyle.Render(fmt.Sprintf("❌ Couldn't get the key: %v", err)))
+        return
     }
     fmt.Println(SuccessStyle.Render(fmt.Sprintf("✔ Key '%v' has value: %v", key, val)))
 }
+
+// Sets the weather data in redis using rejson. The key is the city name.
+// func SetWeather(rh *rejson.Handler, key string, val map[string]interface{}) {
+
+// 	// student := Student{
+// 	// 	Name: Name{
+// 	// 		"Mark",
+// 	// 		"S",
+// 	// 		"Pronto",
+// 	// 	},
+// 	// 	Rank: 1,
+// 	// }
+// 	res, err := rh.JSONSet(key, ".", val)
+// 	if err != nil {
+// 		fmt.Errorf("Failed to JSONSet")
+// 		return
+// 	}
+
+// 	if res.(string) == "OK" {
+// 		fmt.Printf("Success: %s\n", res)
+// 	} else {
+// 		fmt.Println("Failed to Set: ")
+// 	}
+
+// 	studentJSON, err := redis.Bytes(rh.JSONGet("student", "."))
+// 	if err != nil {
+// 		fmt.Errorf("Failed to JSONGet")
+// 		return
+// 	}
+
+// 	readStudent := Student{}
+// 	err = json.Unmarshal(studentJSON, &readStudent)
+// 	if err != nil {
+// 		fmt.Errorf("Failed to JSON Unmarshal")
+// 		return
+// 	}
+
+// 	fmt.Printf("Student read from redis : %#v\n", readStudent)
+// }

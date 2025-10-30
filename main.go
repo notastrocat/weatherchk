@@ -28,7 +28,7 @@ func main() {
 	apiKey, ok := os.LookupEnv("API_KEY")
 	if !ok {
 		// log in Red
-		fmt.Println(ErrStyle.Render("❌ API_KEY variable not set"))
+		fmt.Println(ErrStyle.Render("❌ weatherchk - API_KEY variable not set"))
 		os.Exit(1)
 	}
 
@@ -36,14 +36,18 @@ func main() {
 	fmt.Println()
 
 	client := WeatherClient(apiKey)
-	redisClient := Connect()
-	
-    // Ping the Redis server
-    _, err := redisClient.Ping(ctx).Result()
-    if err != nil {
-        fmt.Println(ErrStyle.Render(fmt.Sprintf("❌ Couldn't connect to Redis: %v", err)))
-    }
-    fmt.Println(SuccessStyle.Render("✔ Connected to Redis successfully!"))
+	redisClient := NewRedisClient()
+
+	defer func() {
+		if err := redisClient.FlushAll(ctx).Err(); err != nil {
+			fmt.Println(ErrStyle.Render(fmt.Sprintf("❌ goredis - failed to flush: %v", err)))
+		}
+		if err := redisClient.Close(); err != nil {
+			fmt.Println(ErrStyle.Render(fmt.Sprintf("❌ goredis - failed to communicate to redis-server: %v", err)))
+		}
+	}()
+
+	rejsonClient := ReJSONClient(redisClient)
 
 	// First, get user input
 	if _, err := tea.NewProgram(InitialTextModel()).Run(); err != nil {
@@ -58,9 +62,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	var startTime = time.Now()
-	GetVal(redisClient, LocationInput)
-	var timeTaken = time.Since(startTime)
-	helpStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
-	fmt.Println(helpStyle.Render(fmt.Sprintf("Took %v (cached)\n", timeTaken.String())))
+	_, err := redisClient.Ping(ctx).Result()
+    if err != nil {
+        fmt.Println(ErrStyle.Render(fmt.Sprintf("❌ goredis - Couldn't connect to Redis: %v", err)))
+    } else {
+    	fmt.Println(SuccessStyle.Render("✔ goredis - Connected to Redis successfully!"))
+		var startTime = time.Now()
+		GetVal(redisClient, LocationInput)
+		var timeTaken = time.Since(startTime)
+		helpStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
+		fmt.Println(helpStyle.Render(fmt.Sprintf("Took %v (cached)\n", timeTaken.String())))
+	}
 }
+
+
