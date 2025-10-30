@@ -54,40 +54,34 @@ func GetVal(rdb *redis.Client, key string) {
 }
 
 // Sets the weather data in redis using rejson. The key is the city name.
-// func SetWeather(rh *rejson.Handler, key string, val map[string]interface{}) {
+func SetWeatherData(rh *rejson.Handler, key string, val map[string]interface{}) (bool, error) {
+	res, err := rh.JSONSet(key, ".", val)
+	if err != nil {
+		return false, fmt.Errorf("rejson - Failed to JSONSet. %v", err)
+	}
 
-// 	// student := Student{
-// 	// 	Name: Name{
-// 	// 		"Mark",
-// 	// 		"S",
-// 	// 		"Pronto",
-// 	// 	},
-// 	// 	Rank: 1,
-// 	// }
-// 	res, err := rh.JSONSet(key, ".", val)
-// 	if err != nil {
-// 		fmt.Errorf("Failed to JSONSet")
-// 		return
-// 	}
+	if res.(string) == "OK" {
+		fmt.Printf("Success: %s\n", res)
+	} else {
+		fmt.Printf("rejson - Failed to Set: %s\n", res)
+	}
 
-// 	if res.(string) == "OK" {
-// 		fmt.Printf("Success: %s\n", res)
-// 	} else {
-// 		fmt.Println("Failed to Set: ")
-// 	}
+    return true, nil
+}
 
-// 	studentJSON, err := redis.Bytes(rh.JSONGet("student", "."))
-// 	if err != nil {
-// 		fmt.Errorf("Failed to JSONGet")
-// 		return
-// 	}
 
-// 	readStudent := Student{}
-// 	err = json.Unmarshal(studentJSON, &readStudent)
-// 	if err != nil {
-// 		fmt.Errorf("Failed to JSON Unmarshal")
-// 		return
-// 	}
+    // separate function to get the weather data
+	// studentJSON, err := redis.Bytes(rh.JSONGet("student", "."))
+	// if err != nil {
+	// 	fmt.Errorf("rejson - Failed to JSONGet. %v", err)
+	// 	return
+	// }
 
-// 	fmt.Printf("Student read from redis : %#v\n", readStudent)
-// }
+	// readStudent := Student{}
+	// err = json.Unmarshal(studentJSON, &readStudent)
+	// if err != nil {
+	// 	fmt.Errorf("Failed to JSON Unmarshal")
+	// 	return
+	// }
+
+	// fmt.Printf("Student read from redis : %#v\n", readStudent)

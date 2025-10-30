@@ -56,7 +56,7 @@ func main() {
 	}
 
 	// Then show spinner while fetching weather
-	p := tea.NewProgram(InitialModel(client, redisClient))
+	p := tea.NewProgram(InitialModel(client, rejsonClient))
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("Error running program: %s\n", err)
 		os.Exit(1)
@@ -74,5 +74,4 @@ func main() {
 		fmt.Println(helpStyle.Render(fmt.Sprintf("Took %v (cached)\n", timeTaken.String())))
 	}
 }
-
 

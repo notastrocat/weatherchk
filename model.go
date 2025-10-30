@@ -8,7 +8,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/redis/go-redis/v9"
+    "github.com/nitishm/go-rejson/v4"
 )
 
 // Model represents the application state
@@ -20,7 +20,7 @@ type Model struct {
 	loading   bool
 	err       error
 	quitting  bool
-	cache     bool
+	isCached  bool
 }
 
 // weatherMsg is used to deliver weather data
@@ -30,13 +30,13 @@ type weatherMsg struct {
 	err       error
 }
 
-var redisClient *redis.Client
+var rejsonClient *rejson.Handler
 
-func InitialModel(client *Client, rdb *redis.Client) Model {
+func InitialModel(client *Client, rh *rejson.Handler) Model {
 	s := spinner.New()
 	s.Spinner = spinner.Jump
 	s.Style = lipgloss.NewStyle().Foreground(lipgloss.Color("205"))
-	redisClient = rdb
+	rejsonClient = rh
 	return Model{
 		spinner: s,
 		client:  client,
@@ -82,7 +82,13 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.result = msg.result
 		m.timeTaken = msg.timeTaken
 
-		m.cache = SetData(redisClient, LocationInput, m.result)
+		// goofy error handling here.
+		var err error
+		m.isCached, err = SetWeatherData(rejsonClient, LocationInput, m.result)
+		if err != nil {
+			// do something about it
+			// m.err = err
+		}
 		return m, tea.Quit
 
 	default:
