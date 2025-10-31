@@ -69,7 +69,7 @@ func SetWeatherData(rh *rejson.Handler, key string, val map[string]interface{}) 
     return true, nil
 }
 
-
+func GetWeatherData(rh *rejson.Handler, key string) {
     // separate function to get the weather data
 	// studentJSON, err := redis.Bytes(rh.JSONGet("student", "."))
 	// if err != nil {
@@ -85,3 +85,4 @@ func SetWeatherData(rh *rejson.Handler, key string, val map[string]interface{}) 
 	// }
 
 	// fmt.Printf("Student read from redis : %#v\n", readStudent)
+}

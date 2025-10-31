@@ -109,10 +109,10 @@ func (m Model) View() string {
 		return m.spinner.View() + " Fetching weather data...\n\n"
 	}
 
-	if m.result != "" {
+	if m.result != nil {
 		timeStr   := fmt.Sprintf("\nTook %v\n\n", m.timeTaken.String())
 
-		return m.result + helpStyle.Render(timeStr)
+		return fmt.Sprintf("%v%s", m.result["currentConditions"].(map[string]interface{})["temp"], helpStyle.Render(timeStr))
 	}
 
 	return m.spinner.View() + " Starting...\n\n"

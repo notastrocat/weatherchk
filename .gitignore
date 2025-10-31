@@ -4,3 +4,6 @@ weatherchk
 # JSON sample files
 *.json
 
+# API key
+api-key.sh
+
