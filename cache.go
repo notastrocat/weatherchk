@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"context"
 	"time"
+    "encoding/json"
 
 	"github.com/redis/go-redis/v9"
     "github.com/nitishm/go-rejson/v4"
@@ -69,20 +70,32 @@ func SetWeatherData(rh *rejson.Handler, key string, val map[string]interface{}) 
     return true, nil
 }
 
+// Gets the weather data from redis using rejson. The key is the city name.
 func GetWeatherData(rh *rejson.Handler, key string) {
-    // separate function to get the weather data
-	// studentJSON, err := redis.Bytes(rh.JSONGet("student", "."))
-	// if err != nil {
-	// 	fmt.Errorf("rejson - Failed to JSONGet. %v", err)
-	// 	return
-	// }
+	res, err := rh.JSONGet(key, ".")
+	if err != nil {
+		fmt.Println(ErrStyle.Render(fmt.Sprintf("❌ rejson - Failed to JSONGet: %v", err)))
+		return
+	}
 
-	// readStudent := Student{}
-	// err = json.Unmarshal(studentJSON, &readStudent)
-	// if err != nil {
-	// 	fmt.Errorf("Failed to JSON Unmarshal")
-	// 	return
-	// }
+	// Convert the result to []byte
+	var weatherJSON []byte
+	switch v := res.(type) {
+	case []byte:
+		weatherJSON = v
+	case string:
+		weatherJSON = []byte(v)
+	default:
+		fmt.Println(ErrStyle.Render(fmt.Sprintf("❌ rejson - Unexpected type from JSONGet: %T", res)))
+		return
+	}
 
-	// fmt.Printf("Student read from redis : %#v\n", readStudent)
+	readWeather := make(map[string]interface{})
+	err = json.Unmarshal(weatherJSON, &readWeather)
+	if err != nil {
+		fmt.Println(ErrStyle.Render(fmt.Sprintf("❌ failed to JSON Unmarshal: %v", err)))
+		return
+	}
+
+	fmt.Printf("Weather read from redis : %#v\n", (readWeather["currentConditions"].(map[string]interface{})["temp"]))
 }

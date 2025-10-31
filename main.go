@@ -62,16 +62,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	_, err := redisClient.Ping(ctx).Result()
-    if err != nil {
-        fmt.Println(ErrStyle.Render(fmt.Sprintf("❌ goredis - Couldn't connect to Redis: %v", err)))
-    } else {
-    	fmt.Println(SuccessStyle.Render("✔ goredis - Connected to Redis successfully!"))
-		var startTime = time.Now()
-		GetVal(redisClient, LocationInput)
-		var timeTaken = time.Since(startTime)
-		helpStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
-		fmt.Println(helpStyle.Render(fmt.Sprintf("Took %v (cached)\n", timeTaken.String())))
-	}
+	// _, err := redisClient.Ping(ctx).Result()
+    // if err != nil {
+    //     fmt.Println(ErrStyle.Render(fmt.Sprintf("❌ goredis - Couldn't connect to Redis: %v", err)))
+    // } else {
+    // 	fmt.Println(SuccessStyle.Render("✔ goredis - Connected to Redis successfully!"))
+	// 	GetVal(redisClient, LocationInput)
+	// 	helpStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
+	// }
+	var startTime = time.Now()
+	GetWeatherData(rejsonClient, LocationInput)
+	var timeTaken = time.Since(startTime)
+	fmt.Println(helpStyle.Render(fmt.Sprintf("Took %v (cached)\n", timeTaken.String())))
 }
 

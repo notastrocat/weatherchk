@@ -40,7 +40,6 @@ func (c *Client) GetCurrentWeather() (map[string]interface{}, time.Duration, err
 		unitType = "metric"
 	}
 
-	
 	url := fmt.Sprintf("%s%s?unitGroup=%s&key=%s&contentType=json", c.baseURL, city, unitType, c.apiKey)
 	// fmt.Printf(WarnStyle.Render("🤔 Fetching weather data from %s\n\n"), url)
 	// fmt.Printf(WarnStyle.Render("🤔 api key: %s\n"), c.apiKey)
