@@ -4,7 +4,9 @@
 - [x] add spinner while calling the API...
 - [x] add caching
 - [ ] add more fields in the result being printed
-- [ ] cache these fields as well
+- [x] add JSON plugin to Redis DB
+- [ ] set expiration for the JSON response stored in Redis DB
+- [x] cache these fields as well
 - [ ] currentConditions in a bigger/text OR centered box.
 - [ ] display in a tabular form (w/o borders) & possible emoji/icons for conditions
 - [ ] a graph for the change in min & max over the week?
